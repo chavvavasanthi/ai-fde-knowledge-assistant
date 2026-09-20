@@ -1,10 +1,20 @@
 import os
 from fastapi import FastAPI, Header, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import FakeEmbeddings
 
 app = FastAPI(title="AI FDE Enterprise Knowledge Assistant")
+
+# CORS Middleware (Streamlit nunchi requests allow cheyadaniki)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mock Auth Token Check (Q.5)
 VALID_API_KEYS = {"enterprise_token_123": "Enterprise_Client_A"}
@@ -20,7 +30,7 @@ class QueryRequest(BaseModel):
 # Sample Mock Database (Q.6 & Q.7)
 MOCK_KNOWLEDGE_BASE = {
     "sla": "Standard customer support SLA response time is 2 hours for high-priority tickets.",
-    "pricing": "Enterprise pricing starts at $1000/month including full workflow integration.",
+    "pricing": "Enterprise pricing starts at $1000/month including Full workflow integration.",
     "security": "All customer data is encrypted using AES-256 both at rest and in transit."
 }
 
@@ -31,10 +41,10 @@ def home():
 @app.post("/api/v1/query")
 async def process_customer_query(request: QueryRequest, client_name: str = Depends(authenticate_user)):
     q = request.question.lower()
-    
+
     # Matching knowledge base (Q.11 & Q.12)
     matched_key = next((k for k in MOCK_KNOWLEDGE_BASE if k in q), None)
-    
+
     if matched_key:
         return {
             "client": client_name,
@@ -52,3 +62,6 @@ async def process_customer_query(request: QueryRequest, client_name: str = Depen
             "status": "escalated_to_human",
             "source": "None"
         }
+    
+   
+           
