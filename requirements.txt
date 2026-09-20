@@ -1,0 +1,10 @@
+Plaintext
+fastapi
+uvicorn
+pydantic
+langchain
+langchain-community
+langchain-openai
+chromadb
+streamlit
+requests
